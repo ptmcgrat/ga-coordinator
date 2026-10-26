@@ -1,0 +1,15 @@
+# Environment for the coordinator scripts (fetch, sync) and the common library.
+#   conda env create -f environment.yml
+#   conda activate ga-coord
+#   pip install -e common
+name: ga-coord
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.11
+  - pyyaml
+  - pytest
+  - ncbi-datasets-cli
+  - htslib
+  - pip

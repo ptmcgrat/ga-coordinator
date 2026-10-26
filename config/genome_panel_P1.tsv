@@ -1,0 +1,26 @@
+panel_version	id	species	code	sample	sex	accession_genbank	accession_refseq	annotated	submitter	released	level	contig_N50_Mb	haplotype_status	role	repeatmasker	arrangement_LG2	arrangement_LG10	arrangement_LG13	notes
+P1	MZ_NMK2024a	Maylandia zebra	MZ	NMK-2024a	male	GCA_041146795.1	GCF_041146795.1	yes	Georgia Institute of Technology	2024-08-12	Chromosome	31.12	collapsed diploid	reference;ancestral	LG2,LG10,LG13				Mzebra_GT3a; LG2 NC_135168.1, LG10 NC_135176.1, LG13 NC_135179.1
+P1	MZ_MZ4f	Maylandia zebra	MZ	MZ4f	female	GCA_057381975.1		no	Georgia Institute of Technology	2026-05-11	Chromosome	30.29	collapsed diploid	ancestral					
+P1	MZ_NMetZ	Maylandia zebra	MZ	Kocher_N_Met_z	female	GCA_057382005.1		no	Georgia Institute of Technology	2026-05-11	Chromosome	29.73	collapsed diploid	ancestral					
+P1	MZ_UMD2025	Maylandia zebra	MZ		male	GCA_047715935.1		no	University of Maryland	2025-02-12	Chromosome	30.85	collapsed diploid	ancestral					23 chromosomes
+P1	MZ_SAMEA123396454	Maylandia zebra	MZ	SAMEA123396454	unknown	GCA_988222425.1		no	Department of Genetics (name to confirm)	2026-09-02	Chromosome	40.11	collapsed diploid	ancestral					
+P1	MZ_SAMEA123396453	Maylandia zebra	MZ	SAMEA123396453	unknown	GCA_988222435.1		no	Department of Genetics (name to confirm)	2026-09-02	Chromosome	40.94	collapsed diploid	ancestral					
+P1	AC_fAstCal68	Astatotilapia calliptera	AC		female	GCA_964374335.1	GCF_964374335.1	yes	Wellcome Sanger Institute	2024-12-01	Chromosome	28.16	collapsed diploid	ancestral	LG2,LG10,LG13				LG2 NC_137423.1, LG10 NC_137431.1, LG13 NC_137434.1
+P1	AC_SAMEA123396441	Astatotilapia calliptera	AC	SAMEA123396441	unknown	GCA_988222555.1		no	Department of Genetics (name to confirm)	2026-09-01	Complete genome	39.9	collapsed diploid	ancestral					one contig per chromosome
+P1	AC_SAMEA123396440	Astatotilapia calliptera	AC	SAMEA123396440	unknown	GCA_988222665.1		no	Department of Genetics (name to confirm)	2026-09-03	Chromosome	40.19	collapsed diploid	ancestral					
+P1	CV_CV1m	Copadichromis virginalis	CV	Kocher_CV1m	male	GCA_057382275.1	GCF_057382275.1	yes	Georgia Institute of Technology	2026-05-11	Chromosome	27.9	collapsed diploid		LG2,LG10,LG13				LG2 NC_140619.1, LG10 NC_140627.1 (inferred), LG13 NC_140630.1
+P1	CV_CV4f	Copadichromis virginalis	CV	ptm_CV4f	female	GCA_057382215.1		no	Georgia Institute of Technology	2026-05-11	Chromosome	28.37	collapsed diploid						
+P1	CV_CV2f	Copadichromis virginalis	CV	Kocher_CV2f	female	GCA_057382225.1		no	Georgia Institute of Technology	2026-05-11	Chromosome	29.24	collapsed diploid						
+P1	DT_005m	Diplotaxodon limnothrissa	DT	DT_005_m	male	GCA_057381915.1	GCF_057381915.1	yes	Georgia Institute of Technology	2026-05-11	Chromosome	30.35	collapsed diploid		LG2,LG10,LG13				LG2 NC_140597.1, LG10 NC_140605.1 (inferred), LG13 NC_140608.1
+P1	DT_004f	Diplotaxodon limnothrissa	DT	DT_004_f	female	GCA_057381945.1		no	Georgia Institute of Technology	2026-05-11	Chromosome	29.33	collapsed diploid						
+P1	DT_SAMEA123396444	Diplotaxodon limnothrissa	DT	SAMEA123396444	unknown	GCA_988222685.1		no	Department of Genetics (name to confirm)	2026-09-03	Chromosome	40.53	collapsed diploid						
+P1	MC_MC1m	Mchenga conophoros	MC	Kocher_MC1m	male	GCA_057382185.1	GCF_057382185.1	yes	Georgia Institute of Technology	2026-05-11	Chromosome	26.56	collapsed diploid		LG2,LG10,LG13				LG2 NC_140527.1, LG10 NC_140535.1 (inferred), LG13 NC_140538.1
+P1	MC_MC3m	Mchenga conophoros	MC	ptm_MC3m	male	GCA_057382125.1		no	Georgia Institute of Technology	2026-05-11	Chromosome	31.01	collapsed diploid						
+P1	MC_MC2f	Mchenga conophoros	MC	Kocher_MC2f	female	GCA_057382135.1		no	Georgia Institute of Technology	2026-05-11	Chromosome	30.66	collapsed diploid						
+P1	RC_006pf	Rhamphochromis longiceps	RC	RC_006_pf	female	GCA_057381845.1	GCF_057381845.1	yes	Georgia Institute of Technology	2026-05-11	Chromosome	31.4	collapsed diploid		LG2,LG10,LG13				LG2 NC_140558.1, LG10 NC_140566.1 (inferred), LG13 NC_140569.1
+P1	RC_005m	Rhamphochromis longiceps	RC	RC_005_m	male	GCA_057381885.1		no	Georgia Institute of Technology	2026-05-11	Chromosome	33.23	collapsed diploid						
+P1	YH_YH1m	Aulonocara sp. 'chitande type north'	YH	Kocher_YH1m	male	GCA_057382095.1	GCF_057382095.1	yes	Georgia Institute of Technology	2026-05-11	Chromosome	31.31	collapsed diploid		LG2,LG10,LG13				LG2 NC_141345.1, LG10 NC_141353.1 (inferred), LG13 NC_141356.1; LG10 X/Y mosaic
+P1	YH_YH2f	Aulonocara sp. 'chitande type north'	YH	Kocher_YH2f	female	GCA_057382045.1		no	Georgia Institute of Technology	2026-05-11	Chromosome	31.99	collapsed diploid						LG10 expected X/X
+P1	YH_YH7f	Aulonocara sp. 'chitande type north'	YH	ptm_YH7f	female	GCA_057382035.1		no	Georgia Institute of Technology	2026-05-11	Chromosome	22.14	collapsed diploid						LG10 expected X/X
+P1	AS_Sanger	Aulonocara stuartgranti	AS		male	GCA_965226115.1	GCF_965226115.1	yes	Wellcome Sanger Institute	2025-03-27	Chromosome	37.45	collapsed diploid						
+P1	AS_SAMEA123396442	Aulonocara stuartgranti	AS	SAMEA123396442	unknown	GCA_988222655.1		no	Department of Genetics (name to confirm)	2026-09-02	Chromosome	40.3	collapsed diploid						

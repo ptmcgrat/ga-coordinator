@@ -1,0 +1,13 @@
+# Copy to config/local.yaml (git-ignored) and edit. Nothing here is committed.
+# Select the profile for this machine (or set GA_PROFILE instead):
+profile: mzebra
+
+# Optional: override anything in paths.yaml, e.g. a different data root or a
+# new profile for another machine.
+#
+# profiles:
+#   mzebra:
+#     data_root: "/some/other/place/GenomeAlignments"
+#   student_laptop:
+#     repos_root: "~/code/GenomeAlignments"
+#     temp_root: "~/Temp"

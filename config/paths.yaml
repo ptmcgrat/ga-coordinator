@@ -1,0 +1,22 @@
+# Where things live. One profile per machine; there is no hostname logic.
+# Choose a profile with the environment variable GA_PROFILE, or with
+# `profile:` in config/local.yaml (untracked; see local.example.yaml).
+#
+# Rule: anything under Dropbox "Apps/" is mirrored under "~/Temp/" on mzebra.
+# So the data root GenomeAlignments is
+#   Dropbox : ptm_dropbox:/CoS/BioSci/BioSci-McGrath/Apps/GenomeAlignments
+#   mzebra  : ~/Temp/GenomeAlignments
+# Repositories (code) are a different place: ~/GenomeAlignments/<repo>.
+
+dropbox:
+  remote: "ptm_dropbox:"
+  apps_root: "/CoS/BioSci/BioSci-McGrath/Apps"
+  data_dir: "GenomeAlignments"
+
+profiles:
+  mzebra:
+    repos_root: "~/GenomeAlignments"
+    temp_root: "~/Temp"          # data root = <temp_root>/<data_dir>
+  laptop:
+    repos_root: "~/GenomeAlignments"
+    temp_root: null              # no local data root on laptops

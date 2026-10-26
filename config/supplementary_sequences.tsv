@@ -1,0 +1,2 @@
+id	species_code	description	source_path	version_label	expected_name	notes
+YH_LG10Y	YH	YH LG10 Y haplotig (haplotig h2tg000014l), not on NCBI	CichlidSequencingData/2026_Nikesh/Chromosome10s/YH_Y.fasta	h2tg000014l	h2tg000014l	copied unchanged from the pilot store; the X haplotig is not copied because the YH panel assemblies carry X
