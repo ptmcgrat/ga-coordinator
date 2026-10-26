@@ -1,7 +1,7 @@
 # Coordinator specification
 
 **Project:** 0, Coordinator (controller)
-**Document version:** 0.6, 2026-10-26 (0.1: first draft; 0.2: panel versions and releases; 0.3: data organization reopened; downloads by accession; 0.4: lab environment recorded; data organization settled; code delivery convention; first code base; 0.5: install commands printed in the conversation; specifications shared as files; 0.6: first real downloads recorded; rclone single-file fix)
+**Document version:** 0.7, 2026-10-26 (0.1: first draft; 0.2: panel versions and releases; 0.3: data organization reopened; downloads by accession; 0.4: lab environment recorded; data organization settled; code delivery convention; first code base; 0.5: install commands printed in the conversation; specifications shared as files; 0.6: first real downloads recorded; rclone single-file fix; 0.7: ecogroups and relatedness context; species table)
 **Owner:** McGrath lab
 **Status:** draft for discussion; not yet in use
 
@@ -185,16 +185,19 @@ version, so earlier panels stay available). **Current panel version: P1** (25 as
 least 20 Mb; one entry per assembly; superseded versions dropped. The common library
 validates the panel (`ga_common.panel`).
 
-| species | code | assemblies | notes |
-|---|---|---|---|
-| *Maylandia zebra* | MZ | 6 | GCF_041146795.1 (NMK-2024a, male) is the **reference** |
-| *Astatotilapia calliptera* | AC | 3 | ancestral arrangement, with MZ |
-| *Copadichromis virginalis* | CV | 3 | |
-| *Diplotaxodon limnothrissa* | DT | 3 | |
-| *Mchenga conophoros* | MC | 3 | |
-| *Rhamphochromis longiceps* | RC | 2 | |
-| *Aulonocara* sp. 'chitande type north' (Yellow Head) | YH | 3 | XY on LG10; the female assemblies should be X/X |
-| *Aulonocara stuartgranti* | AS | 2 | homozygous for the LG10 sex-determination core |
+| species | code | assemblies | ecogroup (section 4b) | notes |
+|---|---|---|---|---|
+| *Maylandia zebra* | MZ | 6 | mbuna | GCF_041146795.1 (NMK-2024a, male) is the **reference** |
+| *Astatotilapia calliptera* | AC | 3 | generalist (stands in for the ancestor) | ancestral arrangement, with MZ |
+| *Copadichromis virginalis* | CV | 3 | utaka | |
+| *Diplotaxodon limnothrissa* | DT | 3 | Diplotaxodon (pelagic) | |
+| *Mchenga conophoros* | MC | 3 | shallow benthic | |
+| *Rhamphochromis longiceps* | RC | 2 | Rhamphochromis (pelagic) | |
+| *Aulonocara* sp. 'chitande type north' (Yellow Head) | YH | 3 | deep benthic (true deep clade) | XY on LG10; the female assemblies should be X/X |
+| *Aulonocara stuartgranti* | AS | 2 | deep benthic | homozygous for the LG10 sex-determination core |
+
+The eight species cover all seven ecogroups of the Lake Malawi radiation. The ecogroups and
+the relatedness between them are in section 4b and in `config/species_context.tsv`.
 
 **Supplementary sequences** (held beside the panel, not part of it; listed in
 `config/supplementary_sequences.tsv`): the YH LG10 **Y haplotig** (h2tg000014l), not on
@@ -263,6 +266,66 @@ version keep every result traceable to the genomes and code that made it.
 the previous one: assemblies added or removed; inversions, breakpoints and
 arrangements that changed; variants and genotypes gained or lost. Calls that stay
 stable as genomes are added are themselves evidence that they are real.
+
+---
+
+## 4b. Relatedness and ecogroups
+
+Context for every project. Sources: Malinsky et al. 2018 (*Nature Ecology & Evolution* 2:1940),
+Blumer et al. 2025 (*Science*, 12 June 2025) and Kumar et al. 2025 (*eLife* 104923). The group
+assignments of the panel species are in `config/species_context.tsv` (validated by
+`ga_common.species`); *Mchenga*, *A. stuartgranti* and *Aulonocara* 'chitande type north' were
+assigned by the owner and agree with Kumar et al. The inversion columns of that table are
+**literature expectations, not results**: project 2b's arrangement table holds the results.
+
+**How closely related**
+- The radiation is young and its sequences are very close: average divergence between species
+  pairs is about 0.1–0.25% (Malinsky), and divergence of 134 individuals from the *M. zebra*
+  reference is 0.19–0.27%. This is SNP-level divergence. None of the three papers measures
+  repeat content or structural divergence between species, which is what projects 1, 2a and 2b
+  will measure.
+- The three subradiations split from a generalist, *Astatotilapia*-like lineage in quick
+  succession: pelagic (*Rhamphochromis* and *Diplotaxodon*) first, then the benthic radiation
+  (shallow benthic, deep benthic, utaka), then mbuna. Malinsky puts the splits at about
+  390–460 thousand years ago (95% intervals about 300–990 ka, assuming 3 years per generation;
+  likely underestimates because of later gene flow); fossil-calibrated work puts the origin of
+  the radiation at 700–800 ka.
+- *A. calliptera* is sister to mbuna in whole-genome trees yet stands for the generalist
+  ancestor. It is not an outgroup.
+- **Relationships are not a single tree.** 62% of species trios violate a bifurcating tree
+  (Malinsky), and Blumer et al. suggest the benthics arose by hybridization between
+  *Diplotaxodon* and *A. calliptera* lineages. A group-level statement about closeness is a
+  summary, not a guarantee for any pair of assemblies.
+
+**Inversions (six rearrangements; Kumar et al. 2025, Blumer et al. 2025)**
+- On LG2, LG9, LG10, LG11, LG13 and LG20, each roughly 10–20 Mb (Kumar gives the largest as
+  20.6 Mb in one place and 22.9 Mb in another), together over 10% of the genome. The inversions
+  on LG11 and LG20 are tandem doubles; on LG20, *Rhamphochromis* carries only the first (left)
+  arm. They are called against the *M. zebra* GT3a reference, which carries the ancestral state of
+  all six.
+- Expected state of the panel species (`ancestral` = as in the reference):
+
+| species | LG2 | LG9 | LG10 | LG11 | LG13 | LG20 |
+|---|---|---|---|---|---|---|
+| MZ (mbuna), AC (generalist) | anc | anc | anc | anc | anc | anc |
+| RC (*Rhamphochromis*) | anc | anc | anc | anc | anc | left arm only |
+| DT (*Diplotaxodon*) | anc | inv | anc | inv | anc | inv |
+| CV (utaka), MC (shallow benthic) | anc | segregating | anc | segregating | anc | inv |
+| AS (deep benthic, no deep-water inversions) | anc | segregating | anc | segregating | anc | inv |
+| YH (deep benthic, true deep clade) | inv | inv | inv | inv | inv | inv |
+
+- LG2, LG10 and LG13 inversions are common in deep benthics and rare in shallow benthics and
+  utaka, but not all deep benthics carry them: *A. stuartgranti* does not. The LG10 inversion is
+  linked to an XY sex-determination system in some deep benthics (YH).
+- Kumar et al. note an error or polymorphism in the *M. zebra* reference on LG2.
+
+**What this means for projects (context, not design)**
+- 1, Repeats: the panel spans all seven ecogroups, so a library build set can span them. Whether
+  one shared library is adequate is untested.
+- 2a, Alignment: expect near-identical sequence with large rearrangements. Pairwise alignments to
+  MZ and the graph must be able to represent inversions of 10–20 Mb on six chromosomes; a panel
+  species can differ from the reference on LG9, LG11 and LG20 as well as LG2, LG10 and LG13.
+- 2b, Structure: the table above is a prior, not a result.
 
 ---
 
@@ -364,6 +427,7 @@ common library. Draft list; exact fields to be agreed with each owning project.
 | contract | owner | format | content |
 |---|---|---|---|
 | `panel` | 0 | TSV | the assembly panel (section 4), with its panel version; validator in `ga_common.panel` (0.1.0) |
+| `species_context` | 0 | TSV | ecogroup and expected inversion state per species code (section 4b); validator in `ga_common.species` (0.2.0) |
 | `release` | 0 | YAML | release record: id, date, panel version, reference, output version per contract (location per the data organization) |
 | `samples` | 0 | TSV | short-read and RNA samples: id, species, sex, arrangements, data location |
 | `repeats` | 1 | RepeatMasker `.out` + BED | per assembly: interval, class, family, divergence |
@@ -407,11 +471,12 @@ One entry per registered output. Projects use only registered outputs, by versio
   conversions (MZ, assembly-native, reverse-stored assemblies).
 - Projects install a pinned version:
   `pip install "git+https://github.com/ptmcgrat/ga-coordinator.git@common-v<x.y.z>#subdirectory=common"`
-  (the tag `common-v0.1.0` is created by the owner when installing `coordinator_001`).
-- **Version 0.1.0** (delivered in `coordinator_001`) holds: `paths` (the data layout and the
+  (the tags `common-v0.1.0` and `common-v0.2.0` are created by the owner when installing
+  `coordinator_001` and `coordinator_004`).
+- **Version 0.2.0** (delivered in `coordinator_004`; 0.1.0 was in `coordinator_001`) holds: `paths` (the data layout and the
   machine profiles), `panel` (reader and validator), `provenance`, `throttle`, `bgzf`
-  (BGZF writer), `seqio` (FASTA and GFF3 helpers) and `rclone` (wrapper). It holds no
-  contract parsers yet.
+  (BGZF writer), `seqio` (FASTA and GFF3 helpers), `rclone` (wrapper) and `species` (the species-context
+  reader and validator). It holds no contract parsers yet.
 - The parsers follow in a later version, starting from the pilot `chr10sv` modules
   `paf.py`, `genes.py`, `repeatmasker.py` and `util.py` (they parse as Python 3.9;
   behaviour is not yet tested here). `vcf.py` is **not** taken: it depends on pilot-specific
@@ -451,6 +516,8 @@ One entry per registered output. Projects use only registered outputs, by versio
    data root and its Dropbox mapping, throttling options, who may work on the
    repository (one person at a time), and that install commands are printed in the
    conversation and specifications are shared as files.
+10. **Relatedness context**: the part of section 4b that bears on the project (ecogroups,
+   expected divergence, expected inversions), stated as context, not as results.
 
 ---
 
@@ -482,6 +549,9 @@ One entry per registered output. Projects use only registered outputs, by versio
 | 2026-10-26 | Common library minimum Python 3.9; coordinator scripts run in conda environment `ga-coord`; the pilot `FileManager` is not reused; `vcf.py` is not carried over and will be redeveloped in another repository. |
 | 2026-10-26 | Install commands are always printed in the conversation, and every specification is shared directly as a file readable in the browser (owner's request); recorded in section 3a (items 6 and 7) and in the template (section 10, item 9). |
 | 2026-10-26 | Single-file copies from Dropbox are made without rclone filters (rclone 1.57 refuses a filter together with a single-file copy); directory copies keep the filter that excludes fetch scratch folders. Found when the first supplementary copy failed on mzebra; fixed in `coordinator_003`. |
+| 2026-10-26 | Ecogroups of the panel species (owner): *Mchenga conophoros* is a shallow benthic; *Aulonocara stuartgranti* is a deep benthic (a rocky *Aulonocara* in Blumer et al.); *Aulonocara* 'chitande type north' is a deep benthic of the true deep clade. Kumar et al. agree. |
+| 2026-10-26 | Ecogroups and expected inversion states are held in a separate species table (`config/species_context.tsv`, common library 0.2.0), not as new columns of the panel, so the `panel` contract is unchanged. The inversion columns are literature expectations, not results. |
+| 2026-10-26 | Six inversions, on LG2, 9, 10, 11, 13 and 20 (Kumar et al. 2025), replace the earlier working assumption of five (Blumer et al.): LG20 is a tandem double inversion that Blumer et al. mention but do not count among their five. |
 | 2026-10-26 | Panel files are named per version (`config/genome_panel_P1.tsv`), resolving the earlier mismatch between sections 4 and 14. |
 
 ---
@@ -512,6 +582,7 @@ One entry per registered output. Projects use only registered outputs, by versio
 | Confirm the inferred LG10 accessions of CV, DT, MC, RC, YH (the sequence reports of their downloads will show them; for MZ the reference's sequence report confirms LG2 NC_135168.1, LG10 NC_135176.1, LG13 NC_135179.1) | 0 | no |
 | Where do short-read data, RNA data, registered outputs, release records and the registry live? | 0, 4, B | when the first of them is needed |
 | Where does the Blumer2025 VCF live? | 5 | when needed |
+| The panel's `arrangement_` columns cover LG2, LG10 and LG13 only, but there are inversions on LG9, LG11 and LG20 too: keep arrangement in the panel (add columns) or only in project 2b's table? | 0, 2b | no |
 | Is `/home` on mzebra backed up, and is there a disk quota? | 0 | no |
 | Does `docs/genome_panel.md` (a readable description of the panel) still need writing, now that the TSV is the panel? | 0 | no |
 
@@ -527,16 +598,17 @@ One entry per registered output. Projects use only registered outputs, by versio
   Installed on mzebra (environment `ga-coord`); its 49 tests pass there.
 - **First real downloads (2026-10-26, mzebra):** `MZ_MZ4f` (GenBank, no annotation) and
   `MZ_NMK2024a` (RefSeq with GFF3; 22 chromosomes LG1–LG20, LG22, LG23 and 41 unplaced scaffolds,
-  63 sequences) were fetched and passed every fetch check. They are in the mzebra data root only:
-  nothing has been pushed to Dropbox yet (a push dry run of `MZ_MZ4f` was clean). The other
-  23 panel assemblies are not downloaded.
-- The first copy of the YH Y haplotig failed on a bug in the rclone wrapper (a filter combined with a
-  single-file copy). Fixed in `coordinator_003`; the copy has not been repeated yet. The source
-  file exists in Dropbox (`YH_Y.fasta`, 28,150,508 bytes).
+  63 sequences) were fetched and passed every fetch check. Both were pushed to Dropbox
+  (`GenomeAlignments/Genomes/...`; the listing shows all 7 files with the sizes the server holds).
+  The YH Y haplotig `YH_LG10Y` was fetched after the rclone fix (one sequence, `h2tg000014l`,
+  27,689,011 bases; all checks true). The remaining 23 panel assemblies and the push of
+  everything else to Dropbox were started on 2026-10-26; their results have not been reported.
 - `coordinator_002` (specification v0.5) changed only the specification, `docs/DELIVERY.md` and
-  `VERSION`. `coordinator_003` (this specification, v0.6) adds the rclone fix and quieter tests.
+  `VERSION`. `coordinator_003` (specification v0.6) added the rclone fix and quieter tests; it is installed on
+  mzebra. `coordinator_004` (this specification, v0.7) adds the species table and `ga_common` 0.2.0.
 - Project 1 (Repeats) specification drafted for discussion with the owner
-  (`repeats_001`, revised in `repeats_002`); its inputs wait for the P1 download.
+  (`repeats_001`, revised in `repeats_002` and `repeats_003`); its inputs wait for the P1 download.
+  Project 2a (Alignment) specification drafted for discussion (`alignment_001`).
 - No releases yet; R1 will be the first complete run on P1.
 - No contracts (beyond `panel`), registry entries or contract parsers yet.
 - The pilot `chr10sv` code remains in use until projects replace it.
