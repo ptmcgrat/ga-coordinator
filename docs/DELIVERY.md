@@ -1,6 +1,7 @@
 # Delivery of code: numbered zips
 
-Applies to every project the coordinator manages (spec section 3a). Replace
+Applies to every project the coordinator manages (spec section 3a). Claude prints these
+commands in the conversation with every zip; this file repeats them. Replace
 `<project>` / `<repo>` / `NNN`. Repositories live in `~/GenomeAlignments/<repo>` on the
 laptop and on mzebra, outside Dropbox.
 

@@ -1,7 +1,7 @@
 # Coordinator specification
 
 **Project:** 0, Coordinator (controller)
-**Document version:** 0.4, 2026-10-26 (0.1: first draft; 0.2: panel versions and releases; 0.3: data organization reopened; downloads by accession; 0.4: lab environment recorded; data organization settled; code delivery convention; first code base)
+**Document version:** 0.5, 2026-10-26 (0.1: first draft; 0.2: panel versions and releases; 0.3: data organization reopened; downloads by accession; 0.4: lab environment recorded; data organization settled; code delivery convention; first code base; 0.5: install commands printed in the conversation; specifications shared as files)
 **Owner:** McGrath lab
 **Status:** draft for discussion; not yet in use
 
@@ -163,6 +163,11 @@ Where analyses run is each project's choice; no project may assume the server.
 4. On the server: `git pull`.
 5. Browsers rename repeated downloads (`name (1).zip`); the instructions always name the
    exact file and check `VERSION` afterwards.
+6. **The install commands are always printed in the conversation** with the zip; the owner
+   should never have to open `INSTRUCTIONS.md` to find them (the file repeats them).
+7. **Every specification document is shared directly as a file** the owner can read in the
+   browser (the coordinator specification, and each project specification when it is
+   issued), not only inside a zip.
 
 **Throttling.** Every script produced takes `--threads` and `--max-jobs` (environment
 variables `GA_MAX_THREADS`, `GA_MAX_JOBS`); scripts that transfer data also take
@@ -442,8 +447,9 @@ One entry per registered output. Projects use only registered outputs, by versio
 8. **Status**: where the project stands; what is ready to integrate.
 9. **Environment and delivery**: the lab environment and the delivery of code (section 3a):
    repository location on laptop and server, numbered zips, `git pull` on the server,
-   data root and its Dropbox mapping, throttling options, and who may work on the
-   repository (one person at a time).
+   data root and its Dropbox mapping, throttling options, who may work on the
+   repository (one person at a time), and that install commands are printed in the
+   conversation and specifications are shared as files.
 
 ---
 
@@ -473,6 +479,7 @@ One entry per registered output. Projects use only registered outputs, by versio
 | 2026-10-26 | Code is delivered as numbered zips (`<project>_NNN.zip`) with a manifest and instructions; the server receives code by `git pull`; every project specification carries this convention. |
 | 2026-10-26 | Every script takes throttling options (`--threads`, `--max-jobs`, `--bwlimit` where data is transferred); no limit by default. |
 | 2026-10-26 | Common library minimum Python 3.9; coordinator scripts run in conda environment `ga-coord`; the pilot `FileManager` is not reused; `vcf.py` is not carried over and will be redeveloped in another repository. |
+| 2026-10-26 | Install commands are always printed in the conversation, and every specification is shared directly as a file readable in the browser (owner's request); recorded in section 3a (items 6 and 7) and in the template (section 10, item 9). |
 | 2026-10-26 | Panel files are named per version (`config/genome_panel_P1.tsv`), resolving the earlier mismatch between sections 4 and 14. |
 
 ---
@@ -518,8 +525,10 @@ One entry per registered output. Projects use only registered outputs, by versio
   provenance, throttle, BGZF, rclone wrapper, `scripts/fetch.py`, `scripts/sync.py`, tests.
   It passes its tests against stand-ins for rclone and `datasets`; it has not yet been
   installed or run on mzebra, and nothing has been downloaded.
+- `coordinator_002` (this specification, v0.5) follows `coordinator_001`; it changes only the
+  specification, `docs/DELIVERY.md` and `VERSION`.
 - Project 1 (Repeats) specification drafted for discussion with the owner
-  (`repeats_001`); its inputs wait for the P1 download.
+  (`repeats_001`, revised in `repeats_002`); its inputs wait for the P1 download.
 - No releases yet; R1 will be the first complete run on P1.
 - No contracts (beyond `panel`), registry entries or contract parsers yet.
 - The pilot `chr10sv` code remains in use until projects replace it.
