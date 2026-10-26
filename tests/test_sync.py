@@ -68,7 +68,10 @@ class SyncTest(unittest.TestCase):
     def test_single_file_push_uses_copyto(self):
         d = self.make_local_version()
         self.assertEqual(self.run_sync("push", "Genomes/MZ_MZ4f/GCA_057381975.1/provenance.json", "--go"), 0)
-        self.assertEqual([c[0] for c in self.sb.rclone_calls() if c[0].startswith("copy")], ["copyto"])
+        calls = [c for c in self.sb.rclone_calls() if c[0].startswith("copy")]
+        self.assertEqual([c[0] for c in calls], ["copyto"])
+        self.assertNotIn("--exclude", calls[0])           # rclone refuses filters with single files
+        self.assertIn("--immutable", calls[0])
 
     def test_throttle_flags_forwarded(self):
         self.make_local_version()

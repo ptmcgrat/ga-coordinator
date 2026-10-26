@@ -1,7 +1,7 @@
 # Coordinator specification
 
 **Project:** 0, Coordinator (controller)
-**Document version:** 0.5, 2026-10-26 (0.1: first draft; 0.2: panel versions and releases; 0.3: data organization reopened; downloads by accession; 0.4: lab environment recorded; data organization settled; code delivery convention; first code base; 0.5: install commands printed in the conversation; specifications shared as files)
+**Document version:** 0.6, 2026-10-26 (0.1: first draft; 0.2: panel versions and releases; 0.3: data organization reopened; downloads by accession; 0.4: lab environment recorded; data organization settled; code delivery convention; first code base; 0.5: install commands printed in the conversation; specifications shared as files; 0.6: first real downloads recorded; rclone single-file fix)
 **Owner:** McGrath lab
 **Status:** draft for discussion; not yet in use
 
@@ -121,7 +121,7 @@ Items marked *(unconfirmed)* were inferred and are not relied on.
 | system | macOS 26.6.1, Apple Silicon (arm64) | Red Hat Enterprise Linux 8.3, kernel 4.18 |
 | capacity | — | 96 cores, 503 GiB RAM, shared (several sessions logged in at once), no job scheduler: jobs run directly |
 | disk | — | `/home` 7.0 T, about 3.6 T free on 2026-10-26; no quota seen *(unconfirmed)*; whether `/home` is backed up is unknown |
-| tools seen | git 2.50.1, Python 3.13.11, rclone at `/usr/local/bin/rclone` | git 2.27.0, rclone v1.57.0-DEV, Python 3.9.18, conda 24.11.3 (channels bioconda, conda-forge, defaults); no docker, singularity or mamba; NCBI reachable |
+| tools seen | git 2.50.1, Python 3.13.11, rclone at `/usr/local/bin/rclone` | git 2.27.0, rclone v1.57.0-DEV, Python 3.9.18, conda 24.11.3 (channels bioconda, conda-forge, defaults); no docker, singularity or mamba; NCBI reachable; in conda environment `ga-coord`: NCBI `datasets` 18.39.0; rclone 1.57 has `--immutable` (checked) |
 | account | owner's | `bio-mcgrath-dropbox`, **shared by all students**; home `/home/ad.gatech.edu/bio-mcgrath-dropbox` |
 | repositories | `~/GenomeAlignments/<repo>`, outside Dropbox | `~/GenomeAlignments/<repo>` |
 | data | none (data lives on the server and in Dropbox) | `~/Temp/GenomeAlignments` (the data root, section 5) |
@@ -334,8 +334,9 @@ stable as genomes are added are themselves evidence that they are real.
   at the destination.
 - **Size, backup, access:** Dropbox and GitHub are what get backed up; the server's working
   copies are regenerable; whether `/home` on mzebra is backed up is unknown. Everyone with
-  the shared account has the same access to the data root. An estimate, not measured: 25
-  whole genomes of about 1 Gb each need roughly 25 GB uncompressed.
+  the shared account has the same access to the data root. Measured on 2026-10-26: `MZ_MZ4f` is
+  296 MB and `MZ_NMK2024a` 294 MB (+ 23 MB GFF3) compressed, each fetched in about a minute; an
+  extrapolation, not a measurement, puts the 25 assemblies of P1 at roughly 7–8 GB compressed.
 
 **Existing data and what happens to it**
 
@@ -480,6 +481,7 @@ One entry per registered output. Projects use only registered outputs, by versio
 | 2026-10-26 | Every script takes throttling options (`--threads`, `--max-jobs`, `--bwlimit` where data is transferred); no limit by default. |
 | 2026-10-26 | Common library minimum Python 3.9; coordinator scripts run in conda environment `ga-coord`; the pilot `FileManager` is not reused; `vcf.py` is not carried over and will be redeveloped in another repository. |
 | 2026-10-26 | Install commands are always printed in the conversation, and every specification is shared directly as a file readable in the browser (owner's request); recorded in section 3a (items 6 and 7) and in the template (section 10, item 9). |
+| 2026-10-26 | Single-file copies from Dropbox are made without rclone filters (rclone 1.57 refuses a filter together with a single-file copy); directory copies keep the filter that excludes fetch scratch folders. Found when the first supplementary copy failed on mzebra; fixed in `coordinator_003`. |
 | 2026-10-26 | Panel files are named per version (`config/genome_panel_P1.tsv`), resolving the earlier mismatch between sections 4 and 14. |
 
 ---
@@ -497,7 +499,6 @@ One entry per registered output. Projects use only registered outputs, by versio
 | question | affects | blocking |
 |---|---|---|
 | **Which accession is fetched for annotated assemblies:** RefSeq (default in `fetch.py`, carries the GFF3) or GenBank? Confirm the default | 0, A, 1 | no |
-| **The first real download is untested:** the fetch script is tested against a stand-in for `datasets` laid out as an NCBI download is expected to be; the first `--go` on mzebra confirms the real layout | 0 | before the P1 download |
 | Contract for the shared repeat library (project 1 output, no contract listed) | 1, 0 | before project 1's first integration |
 | Does the shared library keep the existing family names, now that the family table is recreated? | 1 | no |
 | How the shared library is built (which genomes, RepeatModeler with `-LTRStruct`?) | 1 | no |
@@ -508,7 +509,7 @@ One entry per registered output. Projects use only registered outputs, by versio
 | Which raw long reads are available for junction checks? | 2b | no |
 | Exact fields of each contract | 0, all | per project, before its first integration |
 | Sex and haplotype status for assemblies where NCBI records none | 0, 3 | no |
-| Confirm the inferred LG10 accessions of CV, DT, MC, RC, YH (the sequence reports of the first downloads will show them) | 0 | no |
+| Confirm the inferred LG10 accessions of CV, DT, MC, RC, YH (the sequence reports of their downloads will show them; for MZ the reference's sequence report confirms LG2 NC_135168.1, LG10 NC_135176.1, LG13 NC_135179.1) | 0 | no |
 | Where do short-read data, RNA data, registered outputs, release records and the registry live? | 0, 4, B | when the first of them is needed |
 | Where does the Blumer2025 VCF live? | 5 | when needed |
 | Is `/home` on mzebra backed up, and is there a disk quota? | 0 | no |
@@ -523,10 +524,17 @@ One entry per registered output. Projects use only registered outputs, by versio
 - Data organization settled (section 5). Lab environment recorded (section 3a).
 - First code base written (`coordinator_001`, common library 0.1.0): paths, panel,
   provenance, throttle, BGZF, rclone wrapper, `scripts/fetch.py`, `scripts/sync.py`, tests.
-  It passes its tests against stand-ins for rclone and `datasets`; it has not yet been
-  installed or run on mzebra, and nothing has been downloaded.
-- `coordinator_002` (this specification, v0.5) follows `coordinator_001`; it changes only the
-  specification, `docs/DELIVERY.md` and `VERSION`.
+  Installed on mzebra (environment `ga-coord`); its 49 tests pass there.
+- **First real downloads (2026-10-26, mzebra):** `MZ_MZ4f` (GenBank, no annotation) and
+  `MZ_NMK2024a` (RefSeq with GFF3; 22 chromosomes LG1–LG20, LG22, LG23 and 41 unplaced scaffolds,
+  63 sequences) were fetched and passed every fetch check. They are in the mzebra data root only:
+  nothing has been pushed to Dropbox yet (a push dry run of `MZ_MZ4f` was clean). The other
+  23 panel assemblies are not downloaded.
+- The first copy of the YH Y haplotig failed on a bug in the rclone wrapper (a filter combined with a
+  single-file copy). Fixed in `coordinator_003`; the copy has not been repeated yet. The source
+  file exists in Dropbox (`YH_Y.fasta`, 28,150,508 bytes).
+- `coordinator_002` (specification v0.5) changed only the specification, `docs/DELIVERY.md` and
+  `VERSION`. `coordinator_003` (this specification, v0.6) adds the rclone fix and quieter tests.
 - Project 1 (Repeats) specification drafted for discussion with the owner
   (`repeats_001`, revised in `repeats_002`); its inputs wait for the P1 download.
 - No releases yet; R1 will be the first complete run on P1.

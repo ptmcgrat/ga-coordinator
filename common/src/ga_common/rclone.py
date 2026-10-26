@@ -67,8 +67,13 @@ def lsf(path, bin_=None):
     raise RcloneError("%s\n  exit %d: %s" % (" ".join(cmd), p.returncode, p.stderr.strip()))
 
 
-def transfer_flags(throttle=None, dry_run=True):
-    flags = ["--immutable", "-v", "--exclude", ".ga_tmp_*/**"]
+def transfer_flags(throttle=None, dry_run=True, skip_scratch=True):
+    """Flags for a transfer. skip_scratch adds a filter that keeps fetch scratch folders out of
+    directory copies; rclone refuses filters together with a single-file copy (copyto), so
+    copyto passes skip_scratch=False."""
+    flags = ["--immutable", "-v"]
+    if skip_scratch:
+        flags += ["--exclude", ".ga_tmp_*/**"]
     if dry_run:
         flags.append("--dry-run")
     if throttle is not None:
@@ -88,4 +93,4 @@ def copy(src, dst, throttle=None, dry_run=True, bin_=None):
 
 def copyto(src, dst, throttle=None, dry_run=True, bin_=None):
     """rclone copyto: copy one file to an exact destination path."""
-    return run(["copyto", src, dst] + transfer_flags(throttle, dry_run), bin_)
+    return run(["copyto", src, dst] + transfer_flags(throttle, dry_run, skip_scratch=False), bin_)

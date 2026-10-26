@@ -1,4 +1,6 @@
+import contextlib
 import gzip
+import io
 import json
 import os
 import unittest
@@ -20,7 +22,8 @@ class FetchTest(unittest.TestCase):
         self.sb.close()
 
     def run_fetch(self, *argv, paths=None):
-        return fetch.main(list(argv), paths=paths or self.sb.paths)
+        with contextlib.redirect_stdout(io.StringIO()):          # keep test output quiet
+            return fetch.main(list(argv), paths=paths or self.sb.paths)
 
     def folder(self, aid, acc):
         return self.sb.data_root / "Genomes" / aid / acc
@@ -125,6 +128,9 @@ class FetchTest(unittest.TestCase):
         self.assertEqual(rec["files"][0]["original_name"], "YH_Y.fasta")
         self.assertIn("Apps/CichlidSequencingData/2026_Nikesh/Chromosome10s/YH_Y.fasta", rec["source"]["path"])
         self.assertEqual(sorted(p.name for p in d.iterdir()), ["genome.fna.gz", "provenance.json"])
+        copyto = [c for c in self.sb.rclone_calls() if c[0] == "copyto"][0]
+        self.assertNotIn("--exclude", copyto)
+        self.assertIn("--immutable", copyto)
         self.assertEqual(self.run_fetch("supplementary", "--go"), 0)       # rerun: skipped
 
     def test_supplementary_missing_source(self):

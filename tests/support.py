@@ -46,6 +46,8 @@ FAKE_RCLONE = textwrap.dedent('''\
         sys.exit(0)
     if cmd in ("copy", "copyto"):
         src, dst = real(pos[0]), real(pos[1])
+        if cmd == "copyto" and "--exclude" in args:      # real rclone 1.57 refuses this
+            sys.stderr.write("Can't limit to single files when using filters: " + pos[0] + "\\n"); sys.exit(1)
         if not os.path.exists(src):
             sys.stderr.write("directory not found\\n"); sys.exit(3)
         sys.stderr.write("NOTICE: would copy\\n" if dry else "INFO: copied\\n")
