@@ -1,7 +1,7 @@
 # Coordinator specification
 
 **Project:** 0, Coordinator (controller)
-**Document version:** 0.7, 2026-10-26 (0.1: first draft; 0.2: panel versions and releases; 0.3: data organization reopened; downloads by accession; 0.4: lab environment recorded; data organization settled; code delivery convention; first code base; 0.5: install commands printed in the conversation; specifications shared as files; 0.6: first real downloads recorded; rclone single-file fix; 0.7: ecogroups and relatedness context; species table)
+**Document version:** 0.8, 2026-10-26 (0.1: first draft; 0.2: panel versions and releases; 0.3: data organization reopened; downloads by accession; 0.4: lab environment recorded; data organization settled; code delivery convention; first code base; 0.5: install commands printed in the conversation; specifications shared as files; 0.6: first real downloads recorded; rclone single-file fix; 0.7: ecogroups and relatedness context; species table; 0.8: P1 downloaded; chromosome labels and accessions)
 **Owner:** McGrath lab
 **Status:** draft for discussion; not yet in use
 
@@ -207,8 +207,32 @@ as `YH_LG10Y`. The X haplotig is not copied: the YH panel assemblies carry X.
 **Fields per assembly:** id, species, sample, sex, accession (GenBank, and RefSeq
 if annotated), submitter, release date, level, contig N50, haplotype status
 (collapsed diploid / haplotype-resolved / haplotig), chromosome accessions (LG2,
-LG10, LG13), annotation available, repeat annotation status, arrangement per
-chromosome (filled from project 2b's registered arrangement table).
+LG9, LG10, LG11, LG13, LG20, the six inversion chromosomes; held in the companion table
+`config/panel_chromosomes_P1.tsv`), annotation available, repeat annotation status,
+arrangement per chromosome (filled from project 2b's registered arrangement table).
+
+**Chromosome labels and lengths (observed in the P1 download, 2026-10-26)**
+- The companion table `config/panel_chromosomes_P1.tsv` gives, per assembly, the accession NCBI labels
+  LG2, LG9, LG10, LG11, LG13 and LG20. It is generated from the `provenance.json` files by
+  `scripts/panel_chromosomes.py`, so it can be regenerated and checked.
+- **Two label styles.** 17 assemblies are labelled `LG1`–`LG20`, `LG22`, `LG23` (no LG21; the reference has
+  22 chromosomes). The other 8 (`AC_SAMEA123396440`, `AC_SAMEA123396441`, `AC_fAstCal68`,
+  `AS_SAMEA123396442`, `AS_Sanger`, `DT_SAMEA123396444`, `MZ_SAMEA123396453`, `MZ_SAMEA123396454`) use
+  plain numbers 1–20, 22, 23, the same set. That a number is the same chromosome as the reference's LG
+  is a **working assumption** (the label set and the four longest chromosomes, 3, 7, 23 and 6, agree);
+  alignment must confirm it. Accession order is not a guide to labels: in `AS_Sanger`, label 9 is
+  `NC_138960.1`, after label 23's `NC_138958.1`.
+- The inferred LG10 accessions in the panel notes (CV, DT, MC, RC, YH) match NCBI's labels in the
+  RefSeq assemblies.
+- **Lengths** (label length in Mb; every chromosome is within a few Mb across assemblies except the
+  following; these are observations, not interpretations, and assembly completeness may explain some):
+  - **LG2:** the reference is 48.8 Mb; the 24 other assemblies range 38.5–42.3 Mb.
+  - **LG3:** varies 1.8-fold, 58.7–105.3 Mb (reference 64.4). The reference is *not* an outlier on LG3.
+  - **LG20:** 17.8 Mb (`MC_MC3m`) and 20.3 Mb (`CV_CV2f`), against 35–42 Mb in most; 46.1 (`CV_CV4f`) and
+    44.5 (`DT_004f`) are longer. In every assembly LG20 is one sequence.
+  - **LG10:** `YH_YH2f` 28.4 Mb, `YH_YH1m` 36.5 Mb, the others 34.0–42.1.
+  - **LG9, LG11, LG13:** `MZ_UMD2025` is short on LG9 (29.6), LG11 (33.6) and LG13 (31.6); LG9 is 42–45 Mb
+    in `MZ_NMetZ`, `MZ_MZ4f` and `MC_MC3m` against about 37 in most; LG11 is 43.6 in `YH_YH2f`.
 
 **Reference and ancestry:** all results are reported in MZ (GCF_041146795.1)
 coordinates. MZ and *A. calliptera* carry the ancestral arrangement of each
@@ -397,9 +421,9 @@ assigned by the owner and agree with Kumar et al. The inversion columns of that 
   at the destination.
 - **Size, backup, access:** Dropbox and GitHub are what get backed up; the server's working
   copies are regenerable; whether `/home` on mzebra is backed up is unknown. Everyone with
-  the shared account has the same access to the data root. Measured on 2026-10-26: `MZ_MZ4f` is
-  296 MB and `MZ_NMK2024a` 294 MB (+ 23 MB GFF3) compressed, each fetched in about a minute; an
-  extrapolation, not a measurement, puts the 25 assemblies of P1 at roughly 7–8 GB compressed.
+  the shared account has the same access to the data root. Measured on 2026-10-26: the 25 assemblies of
+  P1 and the Y haplotig total 85 files and 7.348 GiB in Dropbox (a genome is about 300 MB compressed; each
+  took about a minute to fetch).
 
 **Existing data and what happens to it**
 
@@ -426,6 +450,7 @@ common library. Draft list; exact fields to be agreed with each owning project.
 
 | contract | owner | format | content |
 |---|---|---|---|
+| `panel_chromosomes` | 0 | TSV | companion to `panel`: accession of LG2, LG9, LG10, LG11, LG13, LG20 per assembly, generated by `scripts/panel_chromosomes.py` |
 | `panel` | 0 | TSV | the assembly panel (section 4), with its panel version; validator in `ga_common.panel` (0.1.0) |
 | `species_context` | 0 | TSV | ecogroup and expected inversion state per species code (section 4b); validator in `ga_common.species` (0.2.0) |
 | `release` | 0 | YAML | release record: id, date, panel version, reference, output version per contract (location per the data organization) |
@@ -552,6 +577,8 @@ One entry per registered output. Projects use only registered outputs, by versio
 | 2026-10-26 | Ecogroups of the panel species (owner): *Mchenga conophoros* is a shallow benthic; *Aulonocara stuartgranti* is a deep benthic (a rocky *Aulonocara* in Blumer et al.); *Aulonocara* 'chitande type north' is a deep benthic of the true deep clade. Kumar et al. agree. |
 | 2026-10-26 | Ecogroups and expected inversion states are held in a separate species table (`config/species_context.tsv`, common library 0.2.0), not as new columns of the panel, so the `panel` contract is unchanged. The inversion columns are literature expectations, not results. |
 | 2026-10-26 | Six inversions, on LG2, 9, 10, 11, 13 and 20 (Kumar et al. 2025), replace the earlier working assumption of five (Blumer et al.): LG20 is a tandem double inversion that Blumer et al. mention but do not count among their five. |
+| 2026-10-26 | P1 downloaded and pushed to Dropbox (25 assemblies; 85 files with the Y haplotig; 7.348 GiB). |
+| 2026-10-26 | Chromosome accessions of the six inversion chromosomes are held in a generated companion table (`config/panel_chromosomes_P1.tsv`), not in the panel; plain-number labels are taken as the reference's LG numbers as a working assumption until alignment confirms them. An earlier remark that the reference's LG3 is an outlier is withdrawn: LG3 varies 1.8-fold across assemblies. |
 | 2026-10-26 | Panel files are named per version (`config/genome_panel_P1.tsv`), resolving the earlier mismatch between sections 4 and 14. |
 
 ---
@@ -579,11 +606,12 @@ One entry per registered output. Projects use only registered outputs, by versio
 | Which raw long reads are available for junction checks? | 2b | no |
 | Exact fields of each contract | 0, all | per project, before its first integration |
 | Sex and haplotype status for assemblies where NCBI records none | 0, 3 | no |
-| Confirm the inferred LG10 accessions of CV, DT, MC, RC, YH (the sequence reports of their downloads will show them; for MZ the reference's sequence report confirms LG2 NC_135168.1, LG10 NC_135176.1, LG13 NC_135179.1) | 0 | no |
+| Are the plain numbers 1–23 in the 8 assemblies without `LG` labels the same chromosomes as the reference's LG1–LG23? (working assumption; alignment to confirm) | 2a, 2b | no |
 | Where do short-read data, RNA data, registered outputs, release records and the registry live? | 0, 4, B | when the first of them is needed |
 | Where does the Blumer2025 VCF live? | 5 | when needed |
 | The panel's `arrangement_` columns cover LG2, LG10 and LG13 only, but there are inversions on LG9, LG11 and LG20 too: keep arrangement in the panel (add columns) or only in project 2b's table? | 0, 2b | no |
 | Is `/home` on mzebra backed up, and is there a disk quota? | 0 | no |
+| Why is LG20 only 17.8–20.3 Mb in `MC_MC3m` and `CV_CV2f` (35–42 Mb in most assemblies)? Is part of LG20 elsewhere in those assemblies? | 2a, 2b | no |
 | Does `docs/genome_panel.md` (a readable description of the panel) still need writing, now that the TSV is the panel? | 0 | no |
 
 ---
@@ -596,19 +624,18 @@ One entry per registered output. Projects use only registered outputs, by versio
 - First code base written (`coordinator_001`, common library 0.1.0): paths, panel,
   provenance, throttle, BGZF, rclone wrapper, `scripts/fetch.py`, `scripts/sync.py`, tests.
   Installed on mzebra (environment `ga-coord`); its 49 tests pass there.
-- **First real downloads (2026-10-26, mzebra):** `MZ_MZ4f` (GenBank, no annotation) and
-  `MZ_NMK2024a` (RefSeq with GFF3; 22 chromosomes LG1–LG20, LG22, LG23 and 41 unplaced scaffolds,
-  63 sequences) were fetched and passed every fetch check. Both were pushed to Dropbox
-  (`GenomeAlignments/Genomes/...`; the listing shows all 7 files with the sizes the server holds).
-  The YH Y haplotig `YH_LG10Y` was fetched after the rclone fix (one sequence, `h2tg000014l`,
-  27,689,011 bases; all checks true). The remaining 23 panel assemblies and the push of
-  everything else to Dropbox were started on 2026-10-26; their results have not been reported.
+- **Panel P1 downloaded (2026-10-26, mzebra):** all 25 assemblies were fetched by accession, with GFF3
+  for the 8 annotated ones, and passed every fetch check (23 fetched in one run, none failed; the first two
+  earlier). Together with the Y haplotig `YH_LG10Y` (one sequence, `h2tg000014l`, 27,689,011 bases) this is
+  85 files, all pushed to Dropbox `GenomeAlignments/Genomes/` (7.348 GiB; a push of already-present
+  files is skipped, not overwritten). Chromosome labels and lengths: section 4.
 - `coordinator_002` (specification v0.5) changed only the specification, `docs/DELIVERY.md` and
   `VERSION`. `coordinator_003` (specification v0.6) added the rclone fix and quieter tests; it is installed on
-  mzebra. `coordinator_004` (this specification, v0.7) adds the species table and `ga_common` 0.2.0.
+  mzebra. `coordinator_004` (specification v0.7) added the species table and `ga_common` 0.2.0 and is installed on
+  mzebra. `coordinator_005` (this specification, v0.8) adds `config/panel_chromosomes_P1.tsv` and its generator.
 - Project 1 (Repeats) specification drafted for discussion with the owner
-  (`repeats_001`, revised in `repeats_002` and `repeats_003`); its inputs wait for the P1 download.
-  Project 2a (Alignment) specification drafted for discussion (`alignment_001`).
+  (`repeats_001`, revised through `repeats_004`); its inputs (the P1 genomes) are now available.
+  Project 2a (Alignment) specification drafted for discussion (`alignment_001`, revised in `alignment_002`).
 - No releases yet; R1 will be the first complete run on P1.
 - No contracts (beyond `panel`), registry entries or contract parsers yet.
 - The pilot `chr10sv` code remains in use until projects replace it.

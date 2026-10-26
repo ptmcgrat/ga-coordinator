@@ -11,11 +11,13 @@ The authority on all of it is `docs/coordinator_spec.md`.
 | `docs/coordinator_spec.md` | the specification (always replaced whole) |
 | `config/genome_panel_P1.tsv` | assembly panel P1 (25 assemblies) |
 | `config/species_context.tsv` | ecogroup and expected inversion state per species (literature expectations, not results) |
+| `config/panel_chromosomes_P1.tsv` | accession of LG2, 9, 10, 11, 13, 20 per assembly (generated from the downloads) |
 | `config/supplementary_sequences.tsv` | sequences not on NCBI (the YH LG10 Y haplotig) |
 | `config/paths.yaml` | machine profiles (`mzebra`, `laptop`) and the Dropbox location |
 | `config/local.example.yaml` | copy to `config/local.yaml` (untracked) to choose a profile or override paths |
 | `common/` | package `ga_common` 0.2.0: `paths`, `panel`, `species`, `provenance`, `throttle`, `bgzf`, `seqio`, `rclone` |
 | `scripts/fetch.py` | download assemblies by accession (NCBI Datasets) and write provenance |
+| `scripts/panel_chromosomes.py` | regenerate `config/panel_chromosomes_P1.tsv` from the downloaded provenance files |
 | `scripts/sync.py` | move data between the data root and Dropbox (rclone) |
 | `tests/` | `python -m unittest discover -s tests` |
 | `docs/DELIVERY.md` | how code zips are installed (laptop, GitHub, server) |
