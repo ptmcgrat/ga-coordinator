@@ -1,7 +1,7 @@
 # Coordinator specification
 
 **Project:** 0, Coordinator (controller)
-**Document version:** 0.9, 2026-10-26 (0.1: first draft; 0.2: panel versions and releases; 0.3: data organization reopened; downloads by accession; 0.4: lab environment recorded; data organization settled; code delivery convention; first code base; 0.5: install commands printed in the conversation; specifications shared as files; 0.6: first real downloads recorded; rclone single-file fix; 0.7: ecogroups and relatedness context; species table; 0.8: P1 downloaded; chromosome labels and accessions; 0.9: Repeats briefing and working method; satellite question relayed)
+**Document version:** 0.10, 2026-10-26 (0.1: first draft; 0.2: panel versions and releases; 0.3: data organization reopened; downloads by accession; 0.4: lab environment recorded; data organization settled; code delivery convention; first code base; 0.5: install commands printed in the conversation; specifications shared as files; 0.6: first real downloads recorded; rclone single-file fix; 0.7: ecogroups and relatedness context; species table; 0.8: P1 downloaded; chromosome labels and accessions; 0.9: Repeats briefing and working method; satellite question relayed; 0.10: Alignment briefing and working method; using the common library; reference notes from Kumar et al.)
 **Owner:** McGrath lab
 **Status:** draft for discussion; not yet in use
 
@@ -226,8 +226,10 @@ arrangement per chromosome (filled from project 2b's registered arrangement tabl
   RefSeq assemblies.
 - **Lengths** (label length in Mb; every chromosome is within a few Mb across assemblies except the
   following; these are observations, not interpretations, and assembly completeness may explain some):
-  - **LG2:** the reference is 48.8 Mb; the 24 other assemblies range 38.5–42.3 Mb.
-  - **LG3:** varies 1.8-fold, 58.7–105.3 Mb (reference 64.4). The reference is *not* an outlier on LG3.
+  - **LG2:** the reference is 48.8 Mb; the 24 other assemblies range 38.5–42.3 Mb. Kumar et al. 2025 report that alignments
+    of *M. zebra* genomes to their reference differ most prominently in the left arm of chromosome 2.
+  - **LG3:** varies 1.8-fold, 58.7–105.3 Mb (reference 64.4). The reference is *not* an outlier on LG3, but Kumar et al. 2025 describe chromosome 3 as highly
+    repetitive and as the other place where the reference differs from other *M. zebra* assemblies.
   - **LG20:** 17.8 Mb (`MC_MC3m`) and 20.3 Mb (`CV_CV2f`), against 35–42 Mb in most; 46.1 (`CV_CV4f`) and
     44.5 (`DT_004f`) are longer. In every assembly LG20 is one sequence.
   - **LG10:** `YH_YH2f` 28.4 Mb, `YH_YH1m` 36.5 Mb, the others 34.0–42.1.
@@ -326,7 +328,7 @@ assigned by the owner and agree with Kumar et al. The inversion columns of that 
   20.6 Mb in one place and 22.9 Mb in another), together over 10% of the genome. The inversions
   on LG11 and LG20 are tandem doubles; on LG20, *Rhamphochromis* carries only the first (left)
   arm. They are called against the *M. zebra* GT3a reference, which carries the ancestral state of
-  all six.
+  all six (GT3a is assumed to be the same assembly as GCF_041146795.1; to be verified, section 13).
 - Expected state of the panel species (`ancestral` = as in the reference):
 
 | species | LG2 | LG9 | LG10 | LG11 | LG13 | LG20 |
@@ -341,7 +343,8 @@ assigned by the owner and agree with Kumar et al. The inversion columns of that 
 - LG2, LG10 and LG13 inversions are common in deep benthics and rare in shallow benthics and
   utaka, but not all deep benthics carry them: *A. stuartgranti* does not. The LG10 inversion is
   linked to an XY sex-determination system in some deep benthics (YH).
-- Kumar et al. note an error or polymorphism in the *M. zebra* reference on LG2.
+- Kumar et al. note an error or a large polymorphism in the *M. zebra* reference in the left arm of LG2 and in the highly
+  repetitive LG3.
 
 **What this means for projects (context, not design)**
 - 1, Repeats: the panel spans all seven ecogroups, so a library build set can span them. Whether
@@ -496,12 +499,15 @@ One entry per registered output. Projects use only registered outputs, by versio
   conversions (MZ, assembly-native, reverse-stored assemblies).
 - Projects install a pinned version:
   `pip install "git+https://github.com/ptmcgrat/ga-coordinator.git@common-v<x.y.z>#subdirectory=common"`
-  (the tags `common-v0.1.0` and `common-v0.2.0` are created by the owner when installing
-  `coordinator_001` and `coordinator_004`).
-- **Version 0.2.0** (delivered in `coordinator_004`; 0.1.0 was in `coordinator_001`) holds: `paths` (the data layout and the
+  (the tags `common-v0.1.0`, `common-v0.2.0` and `common-v0.2.1` are created by the owner when installing
+  `coordinator_001`, `coordinator_004` and `coordinator_007`). **How other projects use it is in
+  `docs/USING_COMMON.md`:** on mzebra, `pip install -e ~/GenomeAlignments/ga-coordinator/common`, or pinned to a tag.
+- **Version 0.2.1** (delivered in `coordinator_007`; 0.2.0 was in `coordinator_004`, 0.1.0 in `coordinator_001`) holds: `paths` (the data layout and the
   machine profiles), `panel` (reader and validator), `provenance`, `throttle`, `bgzf`
   (BGZF writer), `seqio` (FASTA and GFF3 helpers), `rclone` (wrapper) and `species` (the species-context
-  reader and validator). It holds no contract parsers yet.
+  reader and validator). It holds no contract parsers yet. **It finds the coordinator's `config/` folder through the
+  environment variable `GA_CONFIG_DIR`, else the repository it runs from, else the standard location
+  `~/GenomeAlignments/ga-coordinator/config`** (a normal `pip install` does not carry the config folder; 0.2.0 failed in that case).
 - The parsers follow in a later version, starting from the pilot `chr10sv` modules
   `paf.py`, `genes.py`, `repeatmasker.py` and `util.py` (they parse as Python 3.9;
   behaviour is not yet tested here). `vcf.py` is **not** taken: it depends on pilot-specific
@@ -580,6 +586,9 @@ One entry per registered output. Projects use only registered outputs, by versio
 | 2026-10-26 | P1 downloaded and pushed to Dropbox (25 assemblies; 85 files with the Y haplotig; 7.348 GiB). |
 | 2026-10-26 | Chromosome accessions of the six inversion chromosomes are held in a generated companion table (`config/panel_chromosomes_P1.tsv`), not in the panel; plain-number labels are taken as the reference's LG numbers as a working assumption until alignment confirms them. An earlier remark that the reference's LG3 is an outlier is withdrawn: LG3 varies 1.8-fold across assemblies. |
 | 2026-10-26 | Project 1 (Repeats) works with a student under the owner's supervision. Its first conversation starts at a briefing (`repeats_briefing.md`: the Quah et al. 2025 pangenome paper, then two questions: how many genomes build the library, and how completeness is measured); no installation or run before the owner agrees the plan. Its specification carries checkpoint questions for the student. |
+| 2026-10-26 | Project 2a (Alignment) works with a student under the owner's supervision. Its first conversation starts at a briefing (`alignment_briefing.md`: the prior work, then two questions: how the pairwise alignments and the graph are built, and how the results are checked); no installation or run before the owner agrees the plan. Its specification carries checkpoint questions for the student. |
+| 2026-10-26 | The common library finds the coordinator's configuration through `GA_CONFIG_DIR` or the standard location `~/GenomeAlignments/ga-coordinator/config` (`ga_common` 0.2.1), and `docs/USING_COMMON.md` tells the other projects how to install and use it. Found when a normal install of 0.2.0 into another project could not find `config/paths.yaml`. |
+| 2026-10-26 | Kumar et al. 2025 flag chromosome 3 as well as the left arm of chromosome 2 as places where the reference differs from other *M. zebra* assemblies; recorded as context, not interpreted. |
 | 2026-10-26 | Panel files are named per version (`config/genome_panel_P1.tsv`), resolving the earlier mismatch between sections 4 and 14. |
 
 ---
@@ -613,6 +622,9 @@ One entry per registered output. Projects use only registered outputs, by versio
 | The panel's `arrangement_` columns cover LG2, LG10 and LG13 only, but there are inversions on LG9, LG11 and LG20 too: keep arrangement in the panel (add columns) or only in project 2b's table? | 0, 2b | no |
 | Is `/home` on mzebra backed up, and is there a disk quota? | 0 | no |
 | **Satellites and tandem repeats:** does project 1 or project 2b build and annotate them? (relayed in section 12) | 1, 2b | before project 1's library is accepted |
+| **Output layout** (folder, version naming, manifest) for the alignment and graph outputs, and for later projects' outputs: the owning project proposes with the owner; the coordinator then adds the paths to `ga_common.paths` and extends the version-folder protection in `sync.py` | 0, 2a | before the first alignment output is registered |
+| Readers and validators for PAF and GFA, and coordinate-frame conversions, in `ga_common`: added by the coordinator once project 2a has agreed the contract fields | 0, 2a | before project 2a's first integration |
+| Is the `M_zebra_GT3a` reference of Kumar et al. (WGS project JBEVYI000000000) the same assembly as GCF_041146795.1? (check NCBI's assembly report) | 0, 2a, 2b | no |
 | Why is LG20 only 17.8–20.3 Mb in `MC_MC3m` and `CV_CV2f` (35–42 Mb in most assemblies)? Is part of LG20 elsewhere in those assemblies? | 2a, 2b | no |
 | Does `docs/genome_panel.md` (a readable description of the panel) still need writing, now that the TSV is the panel? | 0 | no |
 
@@ -634,10 +646,10 @@ One entry per registered output. Projects use only registered outputs, by versio
 - `coordinator_002` (specification v0.5) changed only the specification, `docs/DELIVERY.md` and
   `VERSION`. `coordinator_003` (specification v0.6) added the rclone fix and quieter tests; it is installed on
   mzebra. `coordinator_004` (specification v0.7) added the species table and `ga_common` 0.2.0 and is installed on
-  mzebra. `coordinator_005` (specification v0.8) added `config/panel_chromosomes_P1.tsv` and its generator. `coordinator_006` (this specification, v0.9) changes only the specification and `VERSION`.
+  mzebra. `coordinator_005` (specification v0.8) added `config/panel_chromosomes_P1.tsv` and its generator. `coordinator_006` (specification v0.9) changed only the specification and `VERSION`. `coordinator_007` (this specification, v0.10) adds `ga_common` 0.2.1 (configuration discovery) and `docs/USING_COMMON.md`.
 - Project 1 (Repeats) specification drafted for discussion with the owner
-  (`repeats_001`, revised through `repeats_005`, which adds `docs/repeats_briefing.md`); its inputs (the P1 genomes) are now available.
-  Project 2a (Alignment) specification drafted for discussion (`alignment_001`, revised in `alignment_002`).
+  (`repeats_001`, revised through `repeats_008`; `docs/repeats_briefing.md` since `repeats_005`); its inputs (the P1 genomes) are now available.
+  Project 2a (Alignment) specification drafted for discussion (`alignment_001`, revised through `alignment_003`, which adds `docs/alignment_briefing.md`).
 - No releases yet; R1 will be the first complete run on P1.
 - No contracts (beyond `panel`), registry entries or contract parsers yet.
 - The pilot `chr10sv` code remains in use until projects replace it.

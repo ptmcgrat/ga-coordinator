@@ -1,4 +1,5 @@
 import os
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -101,6 +102,57 @@ class PathsTest(unittest.TestCase):
                          "ptm_dropbox:/CoS/BioSci/BioSci-McGrath/Apps/CichlidSequencingData/x/y.fasta")
         with self.assertRaises(gp.PathsError):
             p.apps_remote("../x")
+
+
+class ConfigDiscovery(unittest.TestCase):
+    """A normal pip install carries no config folder: find it through GA_CONFIG_DIR or the standard place."""
+
+    def setUp(self):
+        import shutil
+        import subprocess
+        self.subprocess = subprocess
+        self.root = Path(tempfile.mkdtemp())
+        self.site = self.root / "site"                       # stands in for site-packages
+        shutil.copytree(support.ROOT / "common" / "src" / "ga_common", self.site / "ga_common",
+                        ignore=shutil.ignore_patterns("__pycache__"))
+        self.other = self.root / "other_repo"
+        self.other.mkdir()
+        self.home = self.root / "home"
+        self.cfg = self.home / "GenomeAlignments" / "ga-coordinator" / "config"
+        self.cfg.mkdir(parents=True)
+        (self.cfg / "paths.yaml").write_text((support.CONFIG_DIR / "paths.yaml").read_text())
+        self.elsewhere = self.root / "elsewhere_config"
+        self.elsewhere.mkdir()
+        (self.elsewhere / "paths.yaml").write_text((support.CONFIG_DIR / "paths.yaml").read_text())
+
+    def run_py(self, env_extra=None, home=True):
+        env = {"PATH": os.environ.get("PATH", ""), "PYTHONPATH": str(self.site),
+               "HOME": str(self.home if home else self.root / "nohome"), "GA_PROFILE": "mzebra"}
+        env.update(env_extra or {})
+        code = "from ga_common.paths import Paths; p = Paths.load(); print(p.config_dir)"
+        return self.subprocess.run([sys.executable, "-c", code], cwd=str(self.other), env=env,
+                                   capture_output=True, text=True)
+
+    def test_standard_location_is_the_fallback(self):
+        r = self.run_py()
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(Path(r.stdout.strip()), self.cfg)
+
+    def test_env_variable_wins_over_the_standard_location(self):
+        r = self.run_py({"GA_CONFIG_DIR": str(self.elsewhere)})
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(Path(r.stdout.strip()), self.elsewhere)
+
+    def test_env_variable_is_not_silently_replaced_by_the_fallback(self):
+        r = self.run_py({"GA_CONFIG_DIR": str(self.root / "missing")})
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("GA_CONFIG_DIR", r.stderr)
+
+    def test_nothing_found_gives_a_helpful_message(self):
+        r = self.run_py(home=False)
+        self.assertNotEqual(r.returncode, 0)
+        self.assertIn("GA_CONFIG_DIR", r.stderr)
+        self.assertIn("~/GenomeAlignments/ga-coordinator/config", r.stderr)
 
 
 if __name__ == "__main__":

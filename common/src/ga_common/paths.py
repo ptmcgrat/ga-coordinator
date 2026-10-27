@@ -100,23 +100,34 @@ def _deep_merge(base, over):
     return out
 
 
+DEFAULT_CONFIG_DIR = "~/GenomeAlignments/ga-coordinator/config"     # where the repositories live (spec section 3a)
+
+
 def find_config_dir(explicit=None, environ=None):
+    """Find the coordinator's config folder (the one holding paths.yaml).
+
+    Order: the `explicit` argument; the GA_CONFIG_DIR environment variable (both are used alone,
+    with no fallback); then the config folder of the repository this code runs from or the
+    current directory sits in; then the standard location ~/GenomeAlignments/ga-coordinator/config.
+    A normal `pip install` of ga_common does not carry the config folder along, so projects
+    that install it rely on GA_CONFIG_DIR or on the standard location.
+    """
     env = os.environ if environ is None else environ
-    cands = []
     if explicit:
-        cands.append(Path(explicit))
+        cands = [Path(explicit)]
     elif env.get(CONFIG_ENV):
-        cands.append(Path(env[CONFIG_ENV]))
+        cands = [Path(env[CONFIG_ENV]).expanduser()]
     else:
         cwd = Path.cwd().resolve()
-        cands += [d / "config" for d in [cwd] + list(cwd.parents)]
+        cands = [d / "config" for d in [cwd] + list(cwd.parents)]
         here = Path(__file__).resolve()
         cands += [d / "config" for d in here.parents]
+        cands.append(Path(os.path.expanduser(DEFAULT_CONFIG_DIR)))
     for c in cands:
         if (c / "paths.yaml").is_file():
             return c
-    raise PathsError("config/paths.yaml not found; run from the coordinator repository "
-                     "or set %s" % CONFIG_ENV)
+    raise PathsError("config/paths.yaml not found. Set %s to the coordinator repository's config folder "
+                     "(standard location: %s)" % (CONFIG_ENV, DEFAULT_CONFIG_DIR))
 
 
 class Paths:

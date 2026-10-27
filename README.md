@@ -15,11 +15,12 @@ The authority on all of it is `docs/coordinator_spec.md`.
 | `config/supplementary_sequences.tsv` | sequences not on NCBI (the YH LG10 Y haplotig) |
 | `config/paths.yaml` | machine profiles (`mzebra`, `laptop`) and the Dropbox location |
 | `config/local.example.yaml` | copy to `config/local.yaml` (untracked) to choose a profile or override paths |
-| `common/` | package `ga_common` 0.2.0: `paths`, `panel`, `species`, `provenance`, `throttle`, `bgzf`, `seqio`, `rclone` |
+| `common/` | package `ga_common` 0.2.1: `paths`, `panel`, `species`, `provenance`, `throttle`, `bgzf`, `seqio`, `rclone` |
 | `scripts/fetch.py` | download assemblies by accession (NCBI Datasets) and write provenance |
 | `scripts/panel_chromosomes.py` | regenerate `config/panel_chromosomes_P1.tsv` from the downloaded provenance files |
 | `scripts/sync.py` | move data between the data root and Dropbox (rclone) |
 | `tests/` | `python -m unittest discover -s tests` |
+| `docs/USING_COMMON.md` | how other projects install and use the common library (start here if you are not working on the coordinator) |
 | `docs/DELIVERY.md` | how code zips are installed (laptop, GitHub, server) |
 
 ## Where data lives
