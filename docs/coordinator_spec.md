@@ -1,7 +1,7 @@
 # Coordinator specification
 
 **Project:** 0, Coordinator (controller)
-**Document version:** 0.10, 2026-10-26 (0.1: first draft; 0.2: panel versions and releases; 0.3: data organization reopened; downloads by accession; 0.4: lab environment recorded; data organization settled; code delivery convention; first code base; 0.5: install commands printed in the conversation; specifications shared as files; 0.6: first real downloads recorded; rclone single-file fix; 0.7: ecogroups and relatedness context; species table; 0.8: P1 downloaded; chromosome labels and accessions; 0.9: Repeats briefing and working method; satellite question relayed; 0.10: Alignment briefing and working method; using the common library; reference notes from Kumar et al.)
+**Document version:** 0.11, 2026-10-30 (0.1: first draft; 0.2: panel versions and releases; 0.3: data organization reopened; downloads by accession; 0.4: lab environment recorded; data organization settled; code delivery convention; first code base; 0.5: install commands printed in the conversation; specifications shared as files; 0.6: first real downloads recorded; rclone single-file fix; 0.7: ecogroups and relatedness context; species table; 0.8: P1 downloaded; chromosome labels and accessions; 0.9: Repeats briefing and working method; satellite question relayed; 0.10: Alignment briefing and working method; using the common library; reference notes from Kumar et al.; 0.11: masked genomes are not stored; project 1's pilot plan recorded; Repbase question open)
 **Owner:** McGrath lab
 **Status:** draft for discussion; not yet in use
 
@@ -395,13 +395,20 @@ assigned by the owner and agree with Kumar et al. The inversion columns of that 
         MANIFEST.yaml                 panel version, assemblies used to BUILD the library,
                                       assemblies MASKED, command, tool versions, date
         library/                      the shared repeat library
-        masked/<assembly_id>/         RepeatMasker .out, BED, masked genome
+        masked/<assembly_id>/         RepeatMasker .out and BED (contract `repeats`); no masked genome is stored
       RI_v2/ ...
 ```
 
 - **Naming:** folders and files are keyed to the panel's assembly ids (e.g. `MZ_MZ4f`)
   and accession versions. Sequence names inside files are kept exactly as received;
   nothing is renamed.
+- **Masked genomes are not stored (owner, 2026-10-30).** The `masked/<assembly_id>/` folder of a repeat version holds the RepeatMasker
+  `.out` and the BED (contract `repeats`) and nothing else of the genome. A soft-masked (lowercase) or hard-masked (N) genome is
+  **regenerated on demand** from `Genomes/<assembly_id>/<accession_version>/genome.fna.gz` and the BED. The reasons: a version folder is
+  never overwritten, so a masked form omitted by mistake could be added later only as a new version; a masked genome is derived, so
+  it is regenerable like any working copy; and storing one per assembly would add roughly as much again as the genomes themselves
+  (an estimate of about 7 GiB for P1). When a consuming project asks for a masked form, the coordinator adds the regeneration helper
+  to the common library (section 13); until then nothing is stored.
 - **Versions:** a **version folder is never overwritten** (`Genomes/<id>/<accession_version>`
   and `RepeatInformation/versions/RI_vN`). A change is a new version. The panel version
   does not appear in the `Genomes` layout (a genome is keyed by accession version); it is
@@ -589,6 +596,8 @@ One entry per registered output. Projects use only registered outputs, by versio
 | 2026-10-26 | Project 2a (Alignment) works with a student under the owner's supervision. Its first conversation starts at a briefing (`alignment_briefing.md`: the prior work, then two questions: how the pairwise alignments and the graph are built, and how the results are checked); no installation or run before the owner agrees the plan. Its specification carries checkpoint questions for the student. |
 | 2026-10-26 | The common library finds the coordinator's configuration through `GA_CONFIG_DIR` or the standard location `~/GenomeAlignments/ga-coordinator/config` (`ga_common` 0.2.1), and `docs/USING_COMMON.md` tells the other projects how to install and use it. Found when a normal install of 0.2.0 into another project could not find `config/paths.yaml`. |
 | 2026-10-26 | Kumar et al. 2025 flag chromosome 3 as well as the left arm of chromosome 2 as places where the reference differs from other *M. zebra* assemblies; recorded as context, not interpreted. |
+| 2026-10-28 | Project 1's plan (owner decision, recorded by project 1): the question 1 pilot of three separate de novo libraries (section 13); the Dfam TETools image under Apptainer on mzebra; pilot outputs `RI_v1`, `RI_v2` and `RI_v3` are working records, never registered and not for other projects, so the final library is `RI_v4` or later; the final library is merged with Repbase only at the final masking stage. |
+| 2026-10-30 | **Masked genomes are not stored.** A repeat version's `masked/<assembly_id>/` folder holds the `.out` and the BED only; a soft- or hard-masked genome is regenerated on demand from the genome and the BED (section 5). Owner's decision, answering project 1's blocking item. |
 | 2026-10-26 | Panel files are named per version (`config/genome_panel_P1.tsv`), resolving the earlier mismatch between sections 4 and 14. |
 
 ---
@@ -598,6 +607,8 @@ One entry per registered output. Projects use only registered outputs, by versio
 | date | from | to | question | answer |
 |---|---|---|---|---|
 | 2026-10-26 | owner, through project 1 | project 2b | Who builds and annotates satellites and other tandem repeats (centromeric satellites, arrays): project 1 (Repeats) or project 2b? RepeatModeler targets interspersed repeats; project 2b already owns centromeres and arrays. | pending (project 2b has not started) |
+| 2026-10-30 | project 1 (blocking item) | owner; project 2a | What form of masked genome do the consuming projects need: soft-masked, hard-masked, or only the `.out` and BED? | **Answered by the owner, 2026-10-30:** masked genomes are not stored; they are regenerated from the genome and the BED (section 5). Project 1's folder holds `.out` and BED only. Project 2a is still asked which form it would regenerate (soft, hard or none); this no longer blocks project 1. Fact for 2a: Minigraph-Cactus ignores soft-masking and advises against hard-masking. Projects 2b, 3 and A are asked when they start. |
+| 2026-10-30 | project 1 (blocking item) | coordinator, owner | Where may a library containing Repbase sequences live? The Repbase licence appears to restrict redistribution. | pending the owner's answers (section 13); until then the Repbase file, any merged library containing it, and RepeatMasker `.align` files stay out of the data root, the repositories and Dropbox |
 
 ---
 
@@ -606,10 +617,12 @@ One entry per registered output. Projects use only registered outputs, by versio
 | question | affects | blocking |
 |---|---|---|
 | **Which accession is fetched for annotated assemblies:** RefSeq (default in `fetch.py`, carries the GFF3) or GenBank? Confirm the default | 0, A, 1 | no |
-| Contract for the shared repeat library (project 1 output, no contract listed) | 1, 0 | before project 1's first integration |
+| Contract for the shared repeat library (project 1 output, no contract listed). Proposal: the de novo library plus its cluster table, with no Repbase-containing file in it | 1, 0 | before project 1's first integration |
 | Does the shared library keep the existing family names, now that the family table is recreated? | 1 | no |
-| How the shared library is built (which genomes, RepeatModeler with `-LTRStruct`?) | 1 | no |
-| Where project 1's tools run, and how long jobs are kept alive on the shared server (owned by project 1) | 1 | no |
+| How the shared library is built. **Plan agreed by the owner on 2026-10-28 (project 1's decision):** a pilot of three separate de novo libraries with RepeatModeler and `-LTRStruct`, from `MZ_MZ4f`, `MZ_NMetZ` and `YH_YH2f`, each masking the held-out `DT_004f`; the result decides which genomes build the final library. The final library pools the libraries, de-duplicates them by clustering (`cd-hit-est`, cluster table kept in `library/`) and is merged with Repbase only at the final masking stage | 1 | before the final library is built |
+| Where project 1's tools run: **decided by project 1:** the Dfam TETools image under Apptainer on mzebra, long jobs in `screen`. Open prerequisites: Apptainer, Singularity and Docker were not found on the shared account on 2026-10-26; the exact image tag and tool versions are to be stated by project 1 (the TETools changelog read by the coordinator lists version 2.00 with RepeatMasker 4.2.4 and RepeatModeler 2.0.9, not the 2.01 and RepeatMasker 4.2.6 reported) | 1, 0 | before the pilot runs |
+| **Where a library containing Repbase sequences may live** (asked by project 1). The older Repbase academic terms bar making Repbase or derived material available outside the research group, including on a computer where outsiders have logins; mzebra has other users. Proposal (not decided): a restricted area on mzebra outside the data root with owner-only permissions; `sync.py` and `.gitignore` keep it out of Dropbox and GitHub; `MANIFEST.yaml` holds a pointer (edition, checksum, licence note), never the sequences; the merged library is regenerated when needed. Owner to answer: which agreement covers the lab's copy of Repbase RepeatMasker Edition 20181026; whether owner-only permissions suffice; whether the final library uses Repbase at all (the alternative is de novo plus Dfam, which is open) | 0, 1 | before the final masking |
+| Which masked form (soft, hard or none) projects 2a, 2b, 3 and A would regenerate from the genome and the repeat BED; the coordinator adds a regeneration helper to `ga_common` when one asks (section 12) | 0, 2a, 2b, 3, A | no |
 | Repeat library policy for new panels: frozen (mask new genomes only) or rebuilt (re-mask all)? | 1, all downstream | before P2 |
 | What triggers a new release: every new panel, or a minimum number of new genomes? | 0 | no |
 | Minigraph-Cactus or PGGB? | 2a, 3 | no |
@@ -646,7 +659,7 @@ One entry per registered output. Projects use only registered outputs, by versio
 - `coordinator_002` (specification v0.5) changed only the specification, `docs/DELIVERY.md` and
   `VERSION`. `coordinator_003` (specification v0.6) added the rclone fix and quieter tests; it is installed on
   mzebra. `coordinator_004` (specification v0.7) added the species table and `ga_common` 0.2.0 and is installed on
-  mzebra. `coordinator_005` (specification v0.8) added `config/panel_chromosomes_P1.tsv` and its generator. `coordinator_006` (specification v0.9) changed only the specification and `VERSION`. `coordinator_007` (this specification, v0.10) adds `ga_common` 0.2.1 (configuration discovery) and `docs/USING_COMMON.md`.
+  mzebra. `coordinator_005` (specification v0.8) added `config/panel_chromosomes_P1.tsv` and its generator. `coordinator_006` (specification v0.9) changed only the specification and `VERSION`. `coordinator_007` (specification v0.10) added `ga_common` 0.2.1 (configuration discovery) and `docs/USING_COMMON.md`. `coordinator_008` (this specification, v0.11) changes only the specification and `VERSION`.
 - Project 1 (Repeats) specification drafted for discussion with the owner
   (`repeats_001`, revised through `repeats_008`; `docs/repeats_briefing.md` since `repeats_005`); its inputs (the P1 genomes) are now available.
   Project 2a (Alignment) specification drafted for discussion (`alignment_001`, revised through `alignment_003`, which adds `docs/alignment_briefing.md`).
